@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'u5#3^2$0g%!ph*c$6w)skgo0@+90=t_)cw3@3*hmr)!vvt_qx0'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -69,7 +67,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'blog.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -106,7 +103,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -120,7 +116,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
@@ -129,3 +124,44 @@ STATIC_URL = '/static/'
 STATICFILES_DIR = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+# redis的配置
+CACHES = {
+    'default': {  # 默认
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/0',
+        # 'TIMEOUT': 300,  # NONE 永不超时
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',  # redis-py 客户端
+            # 'PARSER_CLASS': 'redis.connection.HiredisParser',  # hiredis是C客户端，性能更高
+            # 'PASSWORD': 'mysecret',  # 密码，可不设置
+            # 'PICKLE_VERSION': -1,  # 插件使用PICKLE进行序列化,-1表示最新版本
+            # 'SOCKET_CONNECT_TIMEOUT': 5,  # 连接超时
+            # 'SOCKET_TIMEOUT': 5,  # 读写超时
+            # 'CONNECTION_POOL_KWARGS': {"max_connections": 100}  # 连接池最大连接数
+        }
+        # 'CONNECTION_POOL_CLASS': 'redis.connection.BlockingConnectionPool',  # 自定义连接池
+    },
+    'session': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    },
+}
+# sessio由数据库存储改为redis
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'session'
+
+# # 支持主从哨兵模式
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',
+#         'LOCATION': [
+#             'redis://192.168.2.128:6379/1',  # master
+#             'redis://192.168.2.128:6380/1',  # slave
+#         ]
+#
+#     }
+# }
